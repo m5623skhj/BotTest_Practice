@@ -105,6 +105,9 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\User\Desktop\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,7 +131,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Desktop\Common\Log.cpp" />
+    <ClCompile Include="..\..\..\..\Desktop\Common\NetClient.cpp" />
+    <ClCompile Include="..\..\..\..\Desktop\Common\NetServerSerializeBuffer.cpp" />
+    <ClCompile Include="..\..\..\..\Desktop\Common\Parse.cpp" />
+    <ClCompile Include="..\..\..\..\Desktop\Common\PreCompile.cpp" />
+    <ClCompile Include="..\..\..\..\Desktop\Common\Ringbuffer.cpp" />
+    <ClCompile Include="BotTest.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MultiNetClient.cpp" />
+    <ClCompile Include="MultiNetClientSession.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BotTest.h" />
+    <ClInclude Include="MultiNetClient.h" />
+    <ClInclude Include="MultiNetClientSession.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

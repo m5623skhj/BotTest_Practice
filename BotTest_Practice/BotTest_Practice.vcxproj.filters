@@ -13,10 +13,57 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="BotTest">
+      <UniqueIdentifier>{f69fbed2-d899-4b0c-9d64-876039f6f0c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{83689499-eff4-4fee-8f6e-1767c222d06e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\MultiNetClient">
+      <UniqueIdentifier>{a49d103d-ac8c-40cb-9a40-21968ccc3399}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="BotTest.cpp">
+      <Filter>BotTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Desktop\Common\Log.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Desktop\Common\NetClient.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Desktop\Common\NetServerSerializeBuffer.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Desktop\Common\Parse.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Desktop\Common\PreCompile.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Desktop\Common\Ringbuffer.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiNetClient.cpp">
+      <Filter>include\MultiNetClient</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiNetClientSession.cpp">
+      <Filter>include\MultiNetClient</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BotTest.h">
+      <Filter>BotTest</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiNetClient.h">
+      <Filter>include\MultiNetClient</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiNetClientSession.h">
+      <Filter>include\MultiNetClient</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
