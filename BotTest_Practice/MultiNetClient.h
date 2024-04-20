@@ -5,6 +5,8 @@
 #include "ServerCommon.h"
 #include "NetServerSerializeBuffer.h"
 #include "MultiNetClientSession.h"
+#include <vector>
+#include <shared_mutex>
 
 #define NONSENDING	0
 #define SENDING		1
@@ -14,6 +16,8 @@
 #define POST_RETVAL_COMPLETE				2
 
 #define ONE_SEND_WSABUF_MAX					200
+
+class MultiNetClientSession;
 
 class MultiNetClient
 {
@@ -43,7 +47,43 @@ protected:
 	bool OptionParsing(const std::wstring& optionFile);
 
 private:
+	bool ReleaseSession();
+	bool MakeThreads();
+	bool MakeSessionList();
+
+private:
 	void WriteError(int windowError, int userError);
 
-	bool ReleaseSession();
+private:
+	static UINT __stdcall WorkerThread(LPVOID pLanClient);
+	UINT Worker();
+
+	static UINT __stdcall ReconnecterThread(LPVOID pLanClient);
+	UINT Reconnecter();
+
+private:
+	char RecvPost(MultiNetClientSession& session);
+	char SendPost(MultiNetClientSession& session);
+
+private:
+	std::shared_mutex sessionListLock;
+	std::vector<std::shared_ptr<MultiNetClientSession>> sessionList;
+
+private:
+	WCHAR ip[16];
+	WORD port;
+	BYTE nagleOn;
+	BYTE reconnectDiconnectedSession;
+	std::atomic_uint reconnectCount{};
+
+	BYTE numOfWorkerThreads;
+	BYTE numOfUsingWorkerThreads;
+
+	WORD numOfSession;
+	std::atomic<UINT64> m_sessionIdGenerator = 0;
+
+private:
+	HANDLE *workerThreadsHandle;
+	HANDLE workerIOCP;
+	HANDLE reconnecterHandle;
 };

@@ -6,9 +6,14 @@
 #define ONE_SEND_WSABUF_MAX					200
 
 using MultiNetSessionId = UINT64;
+class MultiNetClient;
 
 class MultiNetClientSession
 {
+	friend MultiNetClient;
+
+public:
+	FORCEINLINE MultiNetSessionId GetSessionId() { return sessionId; }
 
 private:
 	struct OverlappedIOBase
@@ -29,6 +34,8 @@ private:
 	};
 
 private:
+	SOCKET socket;
+	std::atomic_bool isConnected = false;
 	std::atomic_bool ioCancle = false;
 	UINT ioCount = 0;
 
