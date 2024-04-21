@@ -14,36 +14,6 @@ bool MultiNetClient::SendPacket(NetBuffer& buffer)
 	return true;
 }
 
-void MultiNetClient::OnReleased(MultiNetSessionId sessionId)
-{
-
-}
-
-void MultiNetClient::OnRecv(MultiNetSessionId sessionId, NetBuffer& buffer)
-{
-
-}
-
-void MultiNetClient::OnSend(MultiNetSessionId sessionId, int sendSize)
-{
-
-}
-
-void MultiNetClient::OnWorkerThreadBegin()
-{
-
-}
-
-void MultiNetClient::OnWorkerThreadEnd()
-{
-
-}
-
-void MultiNetClient::OnError(st_Error& error)
-{
-
-}
-
 bool MultiNetClient::Start(const std::wstring& optionFile)
 {
 	CHECK_ERROR(OptionParsing(optionFile), false, SERVER_ERR::PARSING_ERR);
