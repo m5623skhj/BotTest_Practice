@@ -14,11 +14,6 @@ bool MultiNetClient::SendPacket(NetBuffer& buffer)
 	return true;
 }
 
-void MultiNetClient::OnConnectionCompleted(MultiNetSessionId sessionId)
-{
-
-}
-
 void MultiNetClient::OnReleased(MultiNetSessionId sessionId)
 {
 
