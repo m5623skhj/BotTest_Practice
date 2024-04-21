@@ -30,7 +30,8 @@ public:
 public:
 	bool SendPacket(NetBuffer& buffer);
 
-	virtual void OnConnectionCompleted(MultiNetSessionId sessionId) = 0;
+	virtual void OnConnected(MultiNetSessionId sessionId) = 0;
+	virtual void OnDisconnected(MultiNetSessionId sessionId) = 0;
 	virtual void OnReleased(MultiNetSessionId sessionId) = 0;
 
 	virtual void OnRecv(MultiNetSessionId sessionId, NetBuffer& buffer) = 0;
@@ -47,7 +48,7 @@ protected:
 	bool OptionParsing(const std::wstring& optionFile);
 
 private:
-	bool ReleaseSession();
+	bool ReleaseSession(MultiNetClientSession& session);
 	bool MakeThreads();
 	bool MakeSessionList();
 
@@ -69,6 +70,9 @@ private:
 	std::shared_mutex sessionListLock;
 	std::vector<std::shared_ptr<MultiNetClientSession>> sessionList;
 
+	std::shared_mutex sessionReconnectListLock;
+	std::vector<MultiNetSessionId> sessionReconnectList;
+
 private:
 	WCHAR ip[16];
 	WORD port;
@@ -80,7 +84,9 @@ private:
 	BYTE numOfUsingWorkerThreads;
 
 	WORD numOfSession;
-	std::atomic<UINT64> m_sessionIdGenerator = 0;
+	std::atomic<UINT64> m_sessionIdGenerator{};
+
+	bool stopClient{};
 
 private:
 	HANDLE *workerThreadsHandle;

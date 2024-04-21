@@ -30,7 +30,7 @@ private:
 
 	struct OverlappedIOSendItem : public OverlappedIOBase
 	{
-		CLockFreeQueue<NetBuffer*> SendQ;
+		CLockFreeQueue<NetBuffer*> sendQ;
 	};
 
 private:

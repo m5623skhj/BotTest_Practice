@@ -34,7 +34,23 @@ bool MultiNetClient::Start(const std::wstring& optionFile)
 
 void MultiNetClient::Stop()
 {
+	stopClient = true;
 
+	for (auto& session : sessionList)
+	{
+		shutdown(session->socket, SD_BOTH);
+	}
+
+	PostQueuedCompletionStatus(workerIOCP, 0, 0, (LPOVERLAPPED)1);
+	WaitForMultipleObjects(numOfWorkerThreads, workerThreadsHandle, TRUE, INFINITE);
+
+	for (BYTE i = 0; i < numOfWorkerThreads; ++i)
+	{
+		CloseHandle(workerThreadsHandle[i]);
+	}
+	CloseHandle(workerIOCP);
+
+	WSACleanup();
 }
 
 bool MultiNetClient::OptionParsing(const std::wstring& optionFile)
@@ -90,8 +106,41 @@ bool MultiNetClient::OptionParsing(const std::wstring& optionFile)
 	return true;
 }
 
-bool MultiNetClient::ReleaseSession()
+bool MultiNetClient::ReleaseSession(MultiNetClientSession& session)
 {
+	int sendBufferRestSize = session.sendIOItem.bufferCount;
+	int rest = session.sendIOItem.sendQ.GetRestSize();
+
+	for (int i = 0; i < session.sendIOItem.bufferCount; ++i)
+	{
+		NetBuffer::Free(session.sendBufferStore[i]);
+	}
+
+	if (rest > 0)
+	{
+		NetBuffer* buffer;
+		for (int i = 0; i < rest; ++i)
+		{
+			session.sendIOItem.sendQ.Dequeue(&buffer);
+			NetBuffer::Free(buffer);
+		}
+	}
+
+	closesocket(session.socket);
+	
+	session.isConnected = false;
+	OnDisconnected(session.GetSessionId());
+
+	if (reconnectDiconnectedSession == false)
+	{
+		return true;
+	}
+
+	{
+		std::scoped_lock<std::shared_mutex> lock(sessionReconnectListLock);
+		sessionReconnectList.emplace_back(session.sessionId);
+	}
+
 	return true;
 }
 
@@ -174,7 +223,7 @@ bool MultiNetClient::MakeSessionList()
 		++m_sessionIdGenerator;
 
 		RecvPost(*session);
-		OnConnectionCompleted(session->GetSessionId());
+		OnConnected(session->GetSessionId());
 	}
 
 	return true;
@@ -182,7 +231,10 @@ bool MultiNetClient::MakeSessionList()
 
 void MultiNetClient::WriteError(int windowError, int userError)
 {
-
+	st_Error Error;
+	Error.GetLastErr = windowError;
+	Error.ServerErr = userError;
+	OnError(Error);
 }
 
 UINT __stdcall MultiNetClient::WorkerThread(LPVOID netClient)
