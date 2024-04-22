@@ -218,7 +218,7 @@ bool MultiNetClient::MakeSessionList()
 		CreateIoCompletionPort((HANDLE)session->socket, workerIOCP, (ULONG_PTR)&session, 0);
 
 		session->sendIOItem.bufferCount = 0;
-		session->sendIOItem.ioMode = NONSENDING;
+		session->sendIOItem.ioMode = false;
 
 		session->sessionId = m_sessionIdGenerator;
 		++m_sessionIdGenerator;
@@ -273,7 +273,7 @@ char MultiNetClient::RecvPost(MultiNetClientSession& session)
 	int bufferCount = 1;
 	WSABUF wsaBuffer[2];
 	DWORD flag = 0;
-	MakeWSABuffer(session, bufferCount, wsaBuffer);
+	MakeWSARecvBuffer(session, bufferCount, wsaBuffer);
 
 	++session.ioCount;
 	if (WSARecv(session.socket, wsaBuffer, bufferCount, NULL, &flag, &session.recvIOItem.overlapped, 0) == SOCKET_ERROR)
@@ -297,10 +297,64 @@ char MultiNetClient::RecvPost(MultiNetClientSession& session)
 
 char MultiNetClient::SendPost(MultiNetClientSession& session)
 {
-	return 0;
+	while (1)
+	{
+		bool expected = false;
+		if (session.sendIOItem.ioMode.compare_exchange_strong(expected, true) == false)
+		{
+			return POST_RETVAL_COMPLETE;
+		}
+
+		int useSize = session.sendIOItem.sendQ.GetRestSize();
+		if (useSize == 0)
+		{
+			session.sendIOItem.ioMode = false;
+			if (session.sendIOItem.sendQ.GetRestSize() > 0)
+			{
+				continue;
+			}
+			return POST_RETVAL_COMPLETE;
+		}
+		else if (useSize < 0)
+		{
+			if (--session.ioCount == 0)
+			{
+				ReleaseSession(session);
+				return POST_RETVAL_ERR_SESSION_DELETED;
+			}
+			session.sendIOItem.ioMode = false;
+			return POST_RETVAL_ERR;
+		}
+
+		WSABUF wsaBuffer[ONE_SEND_WSABUF_MAX];
+		MakeWSASendBuffer(session, useSize, wsaBuffer);
+
+		++session.ioCount;
+		if (WSASend(session.socket, wsaBuffer, useSize, NULL, 0, &session.sendIOItem.overlapped, 0) == SOCKET_ERROR)
+		{
+			int wsaError = WSAGetLastError();
+			if (wsaError == ERROR_IO_PENDING)
+			{
+				continue;
+			}
+
+			if (wsaError == WSAENOBUFS)
+			{
+				g_Dump.Crash();
+			}
+
+			WriteError(wsaError, SERVER_ERR::WSASEND_ERR);
+			if (--session.ioCount == 0)
+			{
+				ReleaseSession(session);
+				return POST_RETVAL_ERR_SESSION_DELETED;
+			}
+			return POST_RETVAL_ERR;
+		}
+	}
 }
 
-void MultiNetClient::MakeWSABuffer(MultiNetClientSession& session, OUT int& bufferCount, OUT WSABUF(&wsaBuffer)[2])
+void MultiNetClient::MakeWSARecvBuffer(MultiNetClientSession& session, OUT int& bufferCount, OUT WSABUF(&wsaBuffer)[2])
 {
 	int brokenSize = session.recvIOItem.ringBuffer.GetNotBrokenPutSize();
 	int restSize = session.recvIOItem.ringBuffer.GetFreeSize() - brokenSize;
@@ -313,4 +367,21 @@ void MultiNetClient::MakeWSABuffer(MultiNetClientSession& session, OUT int& buff
 		wsaBuffer[1].len = restSize;
 		++bufferCount;
 	}
+}
+
+void MultiNetClient::MakeWSASendBuffer(MultiNetClientSession& session, OUT int& useSize, OUT WSABUF(&wsaBuffer)[ONE_SEND_WSABUF_MAX])
+{
+	if (useSize < ONE_SEND_WSABUF_MAX)
+	{
+		useSize = ONE_SEND_WSABUF_MAX;
+	}
+
+	for (int i = 0; i < useSize; ++i)
+	{
+		session.sendIOItem.sendQ.Dequeue(&session.sendBufferStore[i]);
+		wsaBuffer[i].buf = session.sendBufferStore[i]->GetBufferPtr();
+		wsaBuffer[i].len = session.sendBufferStore[i]->GetAllUseSize();
+	}
+	session.sendIOItem.bufferCount = useSize;
+
 }

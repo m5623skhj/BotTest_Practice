@@ -8,9 +8,6 @@
 #include <vector>
 #include <shared_mutex>
 
-#define NONSENDING	0
-#define SENDING		1
-
 #define POST_RETVAL_ERR_SESSION_DELETED		0
 #define POST_RETVAL_ERR						1
 #define POST_RETVAL_COMPLETE				2
@@ -66,7 +63,8 @@ private:
 	char RecvPost(MultiNetClientSession& session);
 	char SendPost(MultiNetClientSession& session);
 
-	void MakeWSABuffer(MultiNetClientSession& session, OUT int& bufferCount, OUT WSABUF (&wsaBuffer)[2]);
+	void MakeWSARecvBuffer(MultiNetClientSession& session, OUT int& bufferCount, OUT WSABUF (&wsaBuffer)[2]);
+	void MakeWSASendBuffer(MultiNetClientSession& session, OUT int& useSize, OUT WSABUF (&wsaBuffer)[ONE_SEND_WSABUF_MAX]);
 
 private:
 	std::shared_mutex sessionListLock;

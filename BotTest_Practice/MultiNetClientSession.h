@@ -19,7 +19,7 @@ private:
 	struct OverlappedIOBase
 	{
 		WORD bufferCount;
-		UINT ioMode;
+		std::atomic_bool ioMode;
 		OVERLAPPED overlapped;
 	};
 
