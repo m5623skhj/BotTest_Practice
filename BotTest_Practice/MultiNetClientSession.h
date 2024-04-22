@@ -37,7 +37,7 @@ private:
 	SOCKET socket;
 	std::atomic_bool isConnected = false;
 	std::atomic_bool ioCancle = false;
-	UINT ioCount = 0;
+	std::atomic_uint ioCount = 0;
 
 	UINT nowPostQueuing = 0;
 

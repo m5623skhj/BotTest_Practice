@@ -66,6 +66,8 @@ private:
 	char RecvPost(MultiNetClientSession& session);
 	char SendPost(MultiNetClientSession& session);
 
+	void MakeWSABuffer(MultiNetClientSession& session, OUT int& bufferCount, OUT WSABUF (&wsaBuffer)[2]);
+
 private:
 	std::shared_mutex sessionListLock;
 	std::vector<std::shared_ptr<MultiNetClientSession>> sessionList;

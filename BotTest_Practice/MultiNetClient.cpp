@@ -1,6 +1,7 @@
 #include "PreCompile.h"
 #include "MultiNetClient.h"
 #include "Log.h"
+#include "MultiNetClientSession.h"
 
 #define CHECK_ERROR(Func, FailedResult, FailedServerErrorType) \
 if (Func == FailedResult) \
@@ -259,10 +260,57 @@ UINT MultiNetClient::Reconnecter()
 
 char MultiNetClient::RecvPost(MultiNetClientSession& session)
 {
-	return 0;
+	if (session.recvIOItem.ringBuffer.IsFull() == true)
+	{
+		if (--session.ioCount == 0)
+		{
+			ReleaseSession(session);
+			return POST_RETVAL_ERR_SESSION_DELETED;
+		}
+		return POST_RETVAL_ERR;
+	}
+
+	int bufferCount = 1;
+	WSABUF wsaBuffer[2];
+	DWORD flag = 0;
+	MakeWSABuffer(session, bufferCount, wsaBuffer);
+
+	++session.ioCount;
+	if (WSARecv(session.socket, wsaBuffer, bufferCount, NULL, &flag, &session.recvIOItem.overlapped, 0) == SOCKET_ERROR)
+	{
+		int wsaError = WSAGetLastError();
+		if (wsaError != ERROR_IO_PENDING)
+		{
+			if (--session.ioCount == 0)
+			{
+				ReleaseSession(session);
+				return POST_RETVAL_ERR_SESSION_DELETED;
+			}
+
+			WriteError(wsaError, SERVER_ERR::WSARECV_ERR);
+			return POST_RETVAL_ERR;
+		}
+	}
+
+	return POST_RETVAL_COMPLETE;
 }
 
 char MultiNetClient::SendPost(MultiNetClientSession& session)
 {
 	return 0;
+}
+
+void MultiNetClient::MakeWSABuffer(MultiNetClientSession& session, OUT int& bufferCount, OUT WSABUF(&wsaBuffer)[2])
+{
+	int brokenSize = session.recvIOItem.ringBuffer.GetNotBrokenPutSize();
+	int restSize = session.recvIOItem.ringBuffer.GetFreeSize() - brokenSize;
+
+	wsaBuffer[0].buf = session.recvIOItem.ringBuffer.GetWriteBufferPtr();
+	wsaBuffer[0].len = brokenSize;
+	if (restSize > 0)
+	{
+		wsaBuffer[1].buf = session.recvIOItem.ringBuffer.GetBufferPtr();
+		wsaBuffer[1].len = restSize;
+		++bufferCount;
+	}
 }
