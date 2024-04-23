@@ -59,9 +59,13 @@ private:
 
 	static UINT __stdcall ReconnecterThread(LPVOID pLanClient);
 	UINT Reconnecter();
+	bool ReconnecterImpl(const SOCKADDR_IN& serverAddr);
+	bool ReconnecterImplConnectLoop(MultiNetSessionId releasedSessionId, const SOCKADDR_IN& serverAddr);
 
 	char IOCPRecvCompleted(MultiNetClientSession& session, DWORD transferred);
 	char IOCPSendCompleted(MultiNetClientSession& session);
+
+	bool GenerateRecvCompletedPacket(MultiNetClientSession& session, OUT int& ringBufferRestSize, OUT NetBuffer& recvPacket);
 
 private:
 	char RecvPost(MultiNetClientSession& session);
@@ -74,8 +78,8 @@ private:
 	std::shared_mutex sessionListLock;
 	std::vector<std::shared_ptr<MultiNetClientSession>> sessionList;
 
-	std::shared_mutex sessionReconnectListLock;
-	std::vector<MultiNetSessionId> sessionReconnectList;
+	std::mutex sessionReconnectIdListLock;
+	std::list<MultiNetSessionId> sessionReconnectIdList;
 
 private:
 	WCHAR ip[16];
@@ -96,4 +100,7 @@ private:
 	HANDLE *workerThreadsHandle;
 	HANDLE workerIOCP;
 	HANDLE reconnecterHandle;
+
+private:
+	UINT numOfReconnect{};
 };

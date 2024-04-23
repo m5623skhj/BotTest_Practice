@@ -138,8 +138,8 @@ bool MultiNetClient::ReleaseSession(MultiNetClientSession& session)
 	}
 
 	{
-		std::scoped_lock<std::shared_mutex> lock(sessionReconnectListLock);
-		sessionReconnectList.emplace_back(session.sessionId);
+		std::scoped_lock<std::mutex> lock(sessionReconnectIdListLock);
+		sessionReconnectIdList.emplace_back(session.sessionId);
 	}
 
 	return true;
@@ -245,7 +245,7 @@ UINT __stdcall MultiNetClient::WorkerThread(LPVOID netClient)
 
 UINT MultiNetClient::Worker()
 {
-	srand((ULONGLONG)this);
+	srand((UINT)(this));
 	while (true)
 	{
 		if (WorkerImpl() == false)
@@ -325,55 +325,119 @@ UINT __stdcall MultiNetClient::ReconnecterThread(LPVOID netClient)
 
 UINT MultiNetClient::Reconnecter()
 {
+	SOCKADDR_IN serveraddr;
+	ZeroMemory(&serveraddr, sizeof(serveraddr));
+	InetPton(AF_INET, ip, &serveraddr.sin_addr);
+	serveraddr.sin_family = AF_INET;
+	serveraddr.sin_port = htons(port);
+
+	while (1)
+	{
+		if (stopClient == true ||
+			ReconnecterImpl(serveraddr))
+		{
+			break;
+		}
+
+		Sleep(5000);
+	}
+
 	return 0;
+}
+
+bool MultiNetClient::ReconnecterImpl(const SOCKADDR_IN& serverAddr)
+{
+	MultiNetSessionId releasedSessionId;
+	{
+		std::scoped_lock<std::mutex> lock(sessionReconnectIdListLock);
+		if (sessionReconnectIdList.empty() == true)
+		{
+			return true;
+		}
+		releasedSessionId = *sessionReconnectIdList.begin();
+	}
+
+	sessionList[releasedSessionId]->socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (sessionList[releasedSessionId]->socket == INVALID_SOCKET)
+	{
+		WriteError(WSAGetLastError(), SERVER_ERR::LISTEN_SOCKET_ERR);
+		return false;
+	}
+	if (ReconnecterImplConnectLoop(releasedSessionId, serverAddr) == false)
+	{
+		return false;
+	}
+	sessionList[releasedSessionId]->isConnected = true;
+
+	int returnValue = setsockopt(sessionList[releasedSessionId]->socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&nagleOn, sizeof(int));
+	if (returnValue == SOCKET_ERROR)
+	{
+		WriteError(WSAGetLastError(), SERVER_ERR::SETSOCKOPT_ERR);
+		return false;
+	}
+
+	CreateIoCompletionPort((HANDLE)sessionList[releasedSessionId]->socket, workerIOCP, (ULONG_PTR)&sessionList[releasedSessionId], 0);
+
+	RecvPost(*sessionList[releasedSessionId]);
+
+	++numOfReconnect;
+	OnConnected(sessionList[releasedSessionId]->GetSessionId());
+	{
+		std::scoped_lock<std::mutex> lock(sessionReconnectIdListLock);
+		sessionReconnectIdList.pop_front();
+	}
+
+	_LOG(LOG_LEVEL::LOG_WARNING, L"LanClient", L"ReConnection %d / ThreadID : %d", numOfReconnect, GetCurrentThreadId());
+	return true;
+}
+
+bool MultiNetClient::ReconnecterImplConnectLoop(MultiNetSessionId releasedSessionId, const SOCKADDR_IN& serverAddr)
+{
+	while (1)
+	{
+		if (stopClient == true)
+		{
+			return false;
+		}
+
+		if (connect(sessionList[releasedSessionId]->socket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) != SOCKET_ERROR)
+		{
+			return false;
+		}
+
+		if (GetLastError() == WSAEISCONN)
+		{
+			closesocket(sessionList[releasedSessionId]->socket);
+
+			sessionList[releasedSessionId]->socket = socket(AF_INET, SOCK_STREAM, 0);
+			if (sessionList[releasedSessionId]->socket == INVALID_SOCKET)
+			{
+				WriteError(WSAGetLastError(), SERVER_ERR::LISTEN_SOCKET_ERR);
+				return false;
+			}
+		}
+
+		Sleep(1000);
+	}
+
+	return true;
 }
 
 char MultiNetClient::IOCPRecvCompleted(MultiNetClientSession& session, DWORD transferred)
 {
 	session.recvIOItem.ringBuffer.MoveWritePos(transferred);
 	int ringBufferRestSize = session.recvIOItem.ringBuffer.GetUseSize();
-	bool isOccurredPacketError = false;
 	int bufferDequeueSize = 0;
 
 	while (ringBufferRestSize > df_HEADER_SIZE)
 	{
 		NetBuffer& recvSerializeBuf = *NetBuffer::Alloc();
-		session.recvIOItem.ringBuffer.Peek((char*)recvSerializeBuf.m_pSerializeBuffer, df_HEADER_SIZE);
-		recvSerializeBuf.m_iRead = 0;
-
-		BYTE code;
-		WORD payloadLength;
-		recvSerializeBuf >> code >> payloadLength;
-		if (code != NetBuffer::m_byHeaderCode)
+		if (GenerateRecvCompletedPacket(session, ringBufferRestSize, recvSerializeBuf) == false)
 		{
-			isOccurredPacketError = true;
-			WriteError(0, SERVER_ERR::HEADER_CODE_ERR);
 			NetBuffer::Free(&recvSerializeBuf);
-			break;
-		}
-		if (ringBufferRestSize < payloadLength + df_HEADER_SIZE)
-		{
-			if (payloadLength > dfDEFAULTSIZE)
-			{
-				isOccurredPacketError = true;
-				WriteError(0, SERVER_ERR::PAYLOAD_SIZE_OVER_ERR);
-			}
-			NetBuffer::Free(&recvSerializeBuf);
-			break;
-		}
-		session.recvIOItem.ringBuffer.RemoveData(df_HEADER_SIZE);
-
-		bufferDequeueSize = session.recvIOItem.ringBuffer.Dequeue(&recvSerializeBuf.m_pSerializeBuffer[recvSerializeBuf.m_iWrite], payloadLength);
-		recvSerializeBuf.m_iWrite += bufferDequeueSize;
-		if (!recvSerializeBuf.Decode())
-		{
-			isOccurredPacketError = true;
-			WriteError(0, SERVER_ERR::CHECKSUM_ERR);
-			NetBuffer::Free(&recvSerializeBuf);
-			break;
+			return POST_RETVAL_ERR;
 		}
 
-		ringBufferRestSize -= (bufferDequeueSize + df_HEADER_SIZE);
 		OnRecv(session.GetSessionId(), recvSerializeBuf);
 		NetBuffer::Free(&recvSerializeBuf);
 	}
@@ -394,6 +458,42 @@ char MultiNetClient::IOCPSendCompleted(MultiNetClientSession& session)
 	OnSend(session.GetSessionId(), bufferCount);
 	session.sendIOItem.ioMode = false;
 	return SendPost(session);
+}
+
+bool MultiNetClient::GenerateRecvCompletedPacket(MultiNetClientSession& session, OUT int& ringBufferRestSize, OUT NetBuffer& recvPacket)
+{
+	session.recvIOItem.ringBuffer.Peek((char*)recvPacket.m_pSerializeBuffer, df_HEADER_SIZE);
+	recvPacket.m_iRead = 0;
+
+	BYTE code;
+	WORD payloadLength;
+	recvPacket >> code >> payloadLength;
+	if (code != NetBuffer::m_byHeaderCode)
+	{
+		WriteError(0, SERVER_ERR::HEADER_CODE_ERR);
+		return false;
+	}
+	if (ringBufferRestSize < payloadLength + df_HEADER_SIZE)
+	{
+		if (payloadLength > dfDEFAULTSIZE)
+		{
+			WriteError(0, SERVER_ERR::PAYLOAD_SIZE_OVER_ERR);
+			return false;
+		}
+		return true;
+	}
+	session.recvIOItem.ringBuffer.RemoveData(df_HEADER_SIZE);
+
+	int bufferDequeueSize = session.recvIOItem.ringBuffer.Dequeue(&recvPacket.m_pSerializeBuffer[recvPacket.m_iWrite], payloadLength);
+	recvPacket.m_iWrite += bufferDequeueSize;
+	if (!recvPacket.Decode())
+	{
+		WriteError(0, SERVER_ERR::CHECKSUM_ERR);
+		return false;
+	}
+	ringBufferRestSize -= (bufferDequeueSize + df_HEADER_SIZE);
+
+	return true;
 }
 
 char MultiNetClient::RecvPost(MultiNetClientSession& session)
