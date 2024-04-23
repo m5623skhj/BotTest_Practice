@@ -55,9 +55,13 @@ private:
 private:
 	static UINT __stdcall WorkerThread(LPVOID pLanClient);
 	UINT Worker();
+	bool WorkerImpl();
 
 	static UINT __stdcall ReconnecterThread(LPVOID pLanClient);
 	UINT Reconnecter();
+
+	char IOCPRecvCompleted(MultiNetClientSession& session, DWORD transferred);
+	char IOCPSendCompleted(MultiNetClientSession& session);
 
 private:
 	char RecvPost(MultiNetClientSession& session);

@@ -100,8 +100,8 @@ bool MultiNetClient::OptionParsing(const std::wstring& optionFile)
 	if (!parser.GetValue_Short(pBuff, L"LANCLIENT", L"SESSION_COUNT", (short*)&numOfSession))
 		return false;
 
-	CNetServerSerializationBuf::m_byHeaderCode = HeaderCode;
-	CNetServerSerializationBuf::m_byXORCode = XORCode;
+	NetBuffer::m_byHeaderCode = HeaderCode;
+	NetBuffer::m_byXORCode = XORCode;
 	SetLogLevel(DebugLevel);
 
 	return true;
@@ -245,7 +245,77 @@ UINT __stdcall MultiNetClient::WorkerThread(LPVOID netClient)
 
 UINT MultiNetClient::Worker()
 {
+	srand((ULONGLONG)this);
+	while (true)
+	{
+		if (WorkerImpl() == false)
+		{
+			break;
+		}
+	}
+
+	NetBuffer::ChunkFreeForcibly();
 	return 0;
+}
+
+bool MultiNetClient::WorkerImpl()
+{
+	char postReturnValue;
+	DWORD transferred;
+	MultiNetClientSession** pSession;
+	LPOVERLAPPED overlapped;
+
+	if (GetQueuedCompletionStatus(workerIOCP, &transferred, (PULONG_PTR)&pSession, &overlapped, INFINITE) == FALSE)
+	{
+		WriteError(WSAGetLastError(), SERVER_ERR::GQCS_FAILED);
+		g_Dump.Crash();
+	}
+
+	OnWorkerThreadBegin();
+	if (overlapped == NULL)
+	{
+		WriteError(WSAGetLastError(), SERVER_ERR::OVERLAPPED_NULL_ERR);
+		g_Dump.Crash();
+	}
+	if (pSession == NULL)
+	{
+		PostQueuedCompletionStatus(workerIOCP, 0, 0, NULL);
+		return false;
+	}
+	if (*pSession == nullptr)
+	{
+		g_Dump.Crash();
+	}
+
+	auto& session = **pSession;
+	if (overlapped == &session.recvIOItem.overlapped)
+	{
+		if (transferred == 0)
+		{
+			if (--session.ioCount == 0)
+			{
+				ReleaseSession(session);
+			}
+			return true;
+		}
+		postReturnValue = IOCPRecvCompleted(session, transferred);
+	}
+	else if (overlapped == &session.sendIOItem.overlapped)
+	{
+		postReturnValue = IOCPSendCompleted(session);
+	}
+
+	OnWorkerThreadEnd();
+	if (postReturnValue == POST_RETVAL_ERR_SESSION_DELETED)
+	{
+		return true;
+	}
+	if (--session.ioCount == 0)
+	{
+		ReleaseSession(session);
+	}
+
+	return true;
 }
 
 UINT __stdcall MultiNetClient::ReconnecterThread(LPVOID netClient)
@@ -256,6 +326,74 @@ UINT __stdcall MultiNetClient::ReconnecterThread(LPVOID netClient)
 UINT MultiNetClient::Reconnecter()
 {
 	return 0;
+}
+
+char MultiNetClient::IOCPRecvCompleted(MultiNetClientSession& session, DWORD transferred)
+{
+	session.recvIOItem.ringBuffer.MoveWritePos(transferred);
+	int ringBufferRestSize = session.recvIOItem.ringBuffer.GetUseSize();
+	bool isOccurredPacketError = false;
+	int bufferDequeueSize = 0;
+
+	while (ringBufferRestSize > df_HEADER_SIZE)
+	{
+		NetBuffer& recvSerializeBuf = *NetBuffer::Alloc();
+		session.recvIOItem.ringBuffer.Peek((char*)recvSerializeBuf.m_pSerializeBuffer, df_HEADER_SIZE);
+		recvSerializeBuf.m_iRead = 0;
+
+		BYTE code;
+		WORD payloadLength;
+		recvSerializeBuf >> code >> payloadLength;
+		if (code != NetBuffer::m_byHeaderCode)
+		{
+			isOccurredPacketError = true;
+			WriteError(0, SERVER_ERR::HEADER_CODE_ERR);
+			NetBuffer::Free(&recvSerializeBuf);
+			break;
+		}
+		if (ringBufferRestSize < payloadLength + df_HEADER_SIZE)
+		{
+			if (payloadLength > dfDEFAULTSIZE)
+			{
+				isOccurredPacketError = true;
+				WriteError(0, SERVER_ERR::PAYLOAD_SIZE_OVER_ERR);
+			}
+			NetBuffer::Free(&recvSerializeBuf);
+			break;
+		}
+		session.recvIOItem.ringBuffer.RemoveData(df_HEADER_SIZE);
+
+		bufferDequeueSize = session.recvIOItem.ringBuffer.Dequeue(&recvSerializeBuf.m_pSerializeBuffer[recvSerializeBuf.m_iWrite], payloadLength);
+		recvSerializeBuf.m_iWrite += bufferDequeueSize;
+		if (!recvSerializeBuf.Decode())
+		{
+			isOccurredPacketError = true;
+			WriteError(0, SERVER_ERR::CHECKSUM_ERR);
+			NetBuffer::Free(&recvSerializeBuf);
+			break;
+		}
+
+		ringBufferRestSize -= (bufferDequeueSize + df_HEADER_SIZE);
+		OnRecv(session.GetSessionId(), recvSerializeBuf);
+		NetBuffer::Free(&recvSerializeBuf);
+	}
+
+	return RecvPost(session);
+}
+
+char MultiNetClient::IOCPSendCompleted(MultiNetClientSession& session)
+{
+	int bufferCount = session.sendIOItem.bufferCount;
+	for (int i = 0; i < bufferCount; ++i)
+	{
+		NetBuffer::Free(session.sendBufferStore[i]);
+	}
+
+	session.sendIOItem.bufferCount -= bufferCount;
+
+	OnSend(session.GetSessionId(), bufferCount);
+	session.sendIOItem.ioMode = false;
+	return SendPost(session);
 }
 
 char MultiNetClient::RecvPost(MultiNetClientSession& session)
