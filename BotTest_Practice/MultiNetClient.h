@@ -25,7 +25,7 @@ public:
 	MultiNetClient& operator=(const MultiNetClient& other) = delete;
 
 public:
-	bool SendPacket(NetBuffer& buffer);
+	bool SendPacket(NetBuffer& buffer, MultiNetSessionId sessionId);
 
 	virtual void OnConnected(MultiNetSessionId sessionId) = 0;
 	virtual void OnDisconnected(MultiNetSessionId sessionId) = 0;
@@ -75,7 +75,6 @@ private:
 	void MakeWSASendBuffer(MultiNetClientSession& session, OUT int& useSize, OUT WSABUF (&wsaBuffer)[ONE_SEND_WSABUF_MAX]);
 
 private:
-	std::shared_mutex sessionListLock;
 	std::vector<std::shared_ptr<MultiNetClientSession>> sessionList;
 
 	std::mutex sessionReconnectIdListLock;

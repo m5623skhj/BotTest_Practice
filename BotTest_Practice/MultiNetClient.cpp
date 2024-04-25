@@ -10,8 +10,19 @@ if (Func == FailedResult) \
 	return false; \
 }
 
-bool MultiNetClient::SendPacket(NetBuffer& buffer)
+bool MultiNetClient::SendPacket(NetBuffer& buffer, MultiNetSessionId sessionId)
 {
+	if (buffer.m_bIsEncoded == false)
+	{
+		buffer.m_iWriteLast = buffer.m_iWrite;
+		buffer.m_iWrite = 0;
+		buffer.m_iRead = 0;
+		buffer.Encode();
+	}
+
+	sessionList[sessionId]->sendIOItem.sendQ.Enqueue(&buffer);
+	SendPost(*sessionList[sessionId]);
+
 	return true;
 }
 
