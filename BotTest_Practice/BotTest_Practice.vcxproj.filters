@@ -65,5 +65,11 @@
     <ClInclude Include="MultiNetClientSession.h">
       <Filter>include\MultiNetClient</Filter>
     </ClInclude>
+    <ClInclude Include="TestProtocol.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumType.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

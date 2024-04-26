@@ -144,8 +144,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BotTest.h" />
+    <ClInclude Include="EnumType.h" />
     <ClInclude Include="MultiNetClient.h" />
     <ClInclude Include="MultiNetClientSession.h" />
+    <ClInclude Include="TestProtocol.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
