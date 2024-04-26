@@ -44,3 +44,12 @@ public:
 public:
 	char echoString[30];
 };
+
+#define DECLARE_HANDLE_PACKET(PacketType)\
+	static bool HandlePacket(Bot& bot, PacketType& packet);\
+
+#define DECLARE_ALL_HANDLER()\
+	DECLARE_HANDLE_PACKET(TestStringPacket)\
+	DECLARE_HANDLE_PACKET(EchoStringPacket)\
+	DECLARE_HANDLE_PACKET(Ping)\
+	DECLARE_HANDLE_PACKET(Pong)

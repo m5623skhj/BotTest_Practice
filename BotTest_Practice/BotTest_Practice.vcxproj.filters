@@ -22,6 +22,9 @@
     <Filter Include="include\MultiNetClient">
       <UniqueIdentifier>{a49d103d-ac8c-40cb-9a40-21968ccc3399}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PacketManager">
+      <UniqueIdentifier>{7248d861-5e02-461c-8814-283272bc5ff5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -54,6 +57,15 @@
     <ClCompile Include="MultiNetClientSession.cpp">
       <Filter>include\MultiNetClient</Filter>
     </ClCompile>
+    <ClCompile Include="PacketManager.cpp">
+      <Filter>PacketManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Bot.cpp">
+      <Filter>BotTest</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler.cpp">
+      <Filter>PacketManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BotTest.h">
@@ -70,6 +82,12 @@
     </ClInclude>
     <ClInclude Include="EnumType.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketManager.h">
+      <Filter>PacketManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Bot.h">
+      <Filter>BotTest</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

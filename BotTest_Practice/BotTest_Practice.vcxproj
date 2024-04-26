@@ -137,16 +137,21 @@
     <ClCompile Include="..\..\..\..\Desktop\Common\Parse.cpp" />
     <ClCompile Include="..\..\..\..\Desktop\Common\PreCompile.cpp" />
     <ClCompile Include="..\..\..\..\Desktop\Common\Ringbuffer.cpp" />
+    <ClCompile Include="Bot.cpp" />
     <ClCompile Include="BotTest.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MultiNetClient.cpp" />
     <ClCompile Include="MultiNetClientSession.cpp" />
+    <ClCompile Include="PacketHandler.cpp" />
+    <ClCompile Include="PacketManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bot.h" />
     <ClInclude Include="BotTest.h" />
     <ClInclude Include="EnumType.h" />
     <ClInclude Include="MultiNetClient.h" />
     <ClInclude Include="MultiNetClientSession.h" />
+    <ClInclude Include="PacketManager.h" />
     <ClInclude Include="TestProtocol.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
