@@ -5,7 +5,8 @@
 #include "Bot.h"
 #include <optional>
 
-using PacketHandler = std::function<void()>;
+using PacketHandler = std::function<void(Bot&)>;
+using RecvPacketHandler = std::function<void(Bot&, NetBuffer&)>;
 
 class PacketManager
 {
@@ -21,14 +22,17 @@ public:
 
 public:
 	PacketHandler GetPacketHandler(std::string packetName);
+	RecvPacketHandler GetRecvPacketHandler(std::string packetName);
 	std::optional<std::string> GetPacketName(PacketId packetId);
 
 private:
 	std::unordered_map<std::string, PacketHandler> packetHandlerMap;
+	std::unordered_map<std::string, RecvPacketHandler> recvPacketHandlerMap;
 	std::unordered_map<PacketId, std::string> packetNameMap;
 
 #pragma region PacketHandler
 public:
 	DECLARE_ALL_HANDLER();
+	DECLARE_ALL_RECV_HANDLE_PACKET();
 #pragma endregion PacketHandler
 };

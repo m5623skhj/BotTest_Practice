@@ -46,10 +46,15 @@ public:
 };
 
 #define DECLARE_HANDLE_PACKET(PacketType)\
+	static bool Handle##PacketType(Bot& bot);\
+
+#define DECLARE_RECV_HANDLE_PACKET(PacketType)\
 	static bool Handle##PacketType(Bot& bot, NetBuffer& packet);\
 
 #define DECLARE_ALL_HANDLER()\
 	DECLARE_HANDLE_PACKET(TestStringPacket)\
-	DECLARE_HANDLE_PACKET(EchoStringPacket)\
-	DECLARE_HANDLE_PACKET(Ping)\
-	DECLARE_HANDLE_PACKET(Pong)
+	DECLARE_HANDLE_PACKET(Ping)
+
+#define DECLARE_ALL_RECV_HANDLE_PACKET()\
+	DECLARE_RECV_HANDLE_PACKET(EchoStringPacket)\
+	DECLARE_RECV_HANDLE_PACKET(Pong)

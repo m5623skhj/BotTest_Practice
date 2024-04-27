@@ -18,6 +18,17 @@ PacketHandler PacketManager::GetPacketHandler(std::string packetName)
 	return iter->second;
 }
 
+RecvPacketHandler PacketManager::GetRecvPacketHandler(std::string packetName)
+{
+	auto iter = recvPacketHandlerMap.find(packetName);
+	if (iter == recvPacketHandlerMap.end())
+	{
+		return nullptr;
+	}
+
+	return iter->second;
+}
+
 std::optional<std::string> PacketManager::GetPacketName(PacketId packetId)
 {
 	auto iter = packetNameMap.find(packetId);

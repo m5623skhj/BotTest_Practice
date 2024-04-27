@@ -2,7 +2,7 @@
 #include "PacketManager.h"
 
 
-bool PacketManager::HandleTestStringPacket(Bot& bot, NetBuffer& packet)
+bool PacketManager::HandleTestStringPacket(Bot& bot)
 {
 	return true;
 }
@@ -12,7 +12,7 @@ bool PacketManager::HandleEchoStringPacket(Bot& bot, NetBuffer& packet)
 	return true;
 }
 
-bool PacketManager::HandlePing(Bot& bot, NetBuffer& packet)
+bool PacketManager::HandlePing(Bot& bot)
 {
 	return true;
 }
