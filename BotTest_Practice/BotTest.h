@@ -15,6 +15,10 @@ public:
 	static BotTest& GetInstance();
 
 public:
+	bool Start(const std::wstring& optionFile);
+	void Stop();
+
+private:
 	void OnConnected(MultiNetSessionId sessionId) override;
 	void OnDisconnected(MultiNetSessionId sessionId) override;
 	void OnReleased(MultiNetSessionId sessionId) override;

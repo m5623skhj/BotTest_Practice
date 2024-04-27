@@ -1,12 +1,26 @@
 #include "PreCompile.h"
 #include "BotTest.h"
 #include "PacketManager.h"
-#include "Log.h"
 
 BotTest& BotTest::GetInstance()
 {
 	static BotTest instance;
 	return instance;
+}
+
+bool BotTest::Start(const std::wstring& optionFile)
+{
+	if (MultiNetClient::Start(optionFile) == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void BotTest::Stop()
+{
+	MultiNetClient::Stop();
 }
 
 void BotTest::OnConnected(MultiNetSessionId sessionId)

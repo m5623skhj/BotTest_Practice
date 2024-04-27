@@ -24,9 +24,10 @@ public:
 	MultiNetClient(const MultiNetClient& other) = delete;
 	MultiNetClient& operator=(const MultiNetClient& other) = delete;
 
-public:
+protected:
 	bool SendPacket(NetBuffer& buffer, MultiNetSessionId sessionId);
 
+private:
 	virtual void OnConnected(MultiNetSessionId sessionId) = 0;
 	virtual void OnDisconnected(MultiNetSessionId sessionId) = 0;
 	virtual void OnReleased(MultiNetSessionId sessionId) = 0;
