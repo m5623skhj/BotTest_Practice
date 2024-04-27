@@ -2,22 +2,22 @@
 #include "PacketManager.h"
 
 
-bool PacketManager::HandlePacket(Bot& bot, TestStringPacket& packet)
+bool PacketManager::HandleTestStringPacket(Bot& bot, NetBuffer& packet)
 {
 	return true;
 }
 
-bool PacketManager::HandlePacket(Bot& bot, EchoStringPacket& packet)
+bool PacketManager::HandleEchoStringPacket(Bot& bot, NetBuffer& packet)
 {
 	return true;
 }
 
-bool PacketManager::HandlePacket(Bot& bot, Ping& packet)
+bool PacketManager::HandlePing(Bot& bot, NetBuffer& packet)
 {
 	return true;
 }
 
-bool PacketManager::HandlePacket(Bot& bot, Pong& packet)
+bool PacketManager::HandlePong(Bot& bot, NetBuffer& packet)
 {
 	return true;
 }

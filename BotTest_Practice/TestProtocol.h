@@ -46,7 +46,7 @@ public:
 };
 
 #define DECLARE_HANDLE_PACKET(PacketType)\
-	static bool HandlePacket(Bot& bot, PacketType& packet);\
+	static bool Handle##PacketType(Bot& bot, NetBuffer& packet);\
 
 #define DECLARE_ALL_HANDLER()\
 	DECLARE_HANDLE_PACKET(TestStringPacket)\
