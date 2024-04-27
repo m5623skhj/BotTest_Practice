@@ -17,3 +17,14 @@ PacketHandler PacketManager::GetPacketHandler(std::string packetName)
 
 	return iter->second;
 }
+
+std::optional<std::string> PacketManager::GetPacketName(PacketId packetId)
+{
+	auto iter = packetNameMap.find(packetId);
+	if (iter == packetNameMap.end())
+	{
+		return std::nullopt;
+	}
+
+	return iter->second;
+}

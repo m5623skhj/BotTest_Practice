@@ -1,5 +1,6 @@
 #include "PreCompile.h"
 #include "BotTest.h"
+#include "PacketManager.h"
 
 BotTest& BotTest::GetInstance()
 {
@@ -45,4 +46,9 @@ void BotTest::OnWorkerThreadEnd()
 void BotTest::OnError(st_Error& error)
 {
 
+}
+
+void BotTest::ProcessPacketHandle(const std::string& packetName)
+{
+	auto handler = PacketManager::GetInst().GetPacketHandler();
 }

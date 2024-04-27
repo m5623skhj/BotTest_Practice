@@ -27,5 +27,8 @@ public:
 	void OnError(st_Error& error) override;
 
 private:
+	void ProcessPacketHandle(const std::string& packetName);
+
+private:
 	std::vector<Bot::SPtr> botList;
 };
