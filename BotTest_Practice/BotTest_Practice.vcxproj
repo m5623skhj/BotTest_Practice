@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\User\Desktop\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\User\Desktop\Common;C:\Users\User\Desktop\Common\json-develop\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -137,6 +137,7 @@
     <ClCompile Include="..\..\..\..\Desktop\Common\Parse.cpp" />
     <ClCompile Include="..\..\..\..\Desktop\Common\PreCompile.cpp" />
     <ClCompile Include="..\..\..\..\Desktop\Common\Ringbuffer.cpp" />
+    <ClCompile Include="Action.cpp" />
     <ClCompile Include="Bot.cpp" />
     <ClCompile Include="BotTest.cpp" />
     <ClCompile Include="main.cpp" />
@@ -146,8 +147,10 @@
     <ClCompile Include="PacketManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Action.h" />
     <ClInclude Include="Bot.h" />
     <ClInclude Include="BotTest.h" />
+    <ClInclude Include="Define.h" />
     <ClInclude Include="EnumType.h" />
     <ClInclude Include="MultiNetClient.h" />
     <ClInclude Include="MultiNetClientSession.h" />

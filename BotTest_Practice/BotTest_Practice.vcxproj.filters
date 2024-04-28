@@ -66,6 +66,9 @@
     <ClCompile Include="PacketHandler.cpp">
       <Filter>PacketManager</Filter>
     </ClCompile>
+    <ClCompile Include="Action.cpp">
+      <Filter>BotTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BotTest.h">
@@ -88,6 +91,12 @@
     </ClInclude>
     <ClInclude Include="Bot.h">
       <Filter>BotTest</Filter>
+    </ClInclude>
+    <ClInclude Include="Action.h">
+      <Filter>BotTest</Filter>
+    </ClInclude>
+    <ClInclude Include="Define.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

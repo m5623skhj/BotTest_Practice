@@ -15,3 +15,18 @@ void Bot::OnDisconnected()
 {
 	isConnected = false;
 }
+
+ScenarioIndex Bot::GetScenarioIndex()
+{
+	return scenarioIndex;
+}
+
+void Bot::OnScenarioCompleted()
+{
+	++scenarioIndex;
+}
+
+void Bot::OnTestCompleted()
+{
+
+}
