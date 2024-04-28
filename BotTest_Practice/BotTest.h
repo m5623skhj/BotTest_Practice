@@ -8,8 +8,8 @@ class BotTest : public MultiNetClient
 private:
 	BotTest() = default;
 	~BotTest() = default;	
-	BotTest(const BotTest& other) = delete; \
-	BotTest& operator=(const BotTest& other) = delete; \
+	BotTest(const BotTest& other) = delete;
+	BotTest& operator=(const BotTest& other) = delete;
 
 public:
 	static BotTest& GetInstance();
