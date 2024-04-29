@@ -1,0 +1,10 @@
+{
+    "Scenario": [
+        {
+            "Action": "Ping"            
+        },
+        {
+            "Action": "Ping"
+        }
+    ]
+}

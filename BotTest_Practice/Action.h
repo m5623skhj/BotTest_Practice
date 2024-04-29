@@ -50,12 +50,12 @@ private:
 #pragma region BotAction
 struct IBotAction
 {
-	virtual void DoAction() = 0;
+	virtual void DoAction(Bot& targetBot) = 0;
 };
 
 struct BotAction_Ping : public IBotAction
 {
-	void DoAction() override;
+	void DoAction(Bot& targetBot) override;
 };
 
 #define REGISTER_BOT_ACTION(ActionType, ActionString){\

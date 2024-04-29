@@ -2,6 +2,7 @@
 #include "Action.h"
 #include "nlohmann/json.hpp"
 #include "Bot.h"
+#include "PacketManager.h"
 #include <fstream>
 
 BotActionManager& BotActionManager::GetInst()
@@ -34,7 +35,7 @@ void BotActionManager::DoBotAction(Bot& targetBot)
 		throw;
 	}
 
-	itor()->DoAction();
+	itor()->DoAction(targetBot);
 }
 
 bool BotActionManager::ReadBotTestScenario()
@@ -57,17 +58,33 @@ bool BotActionManager::ReadBotTestScenario()
 		return false;
 	}
 
-	for (const auto& json : jsonData)
+	if (not jsonData.is_object() || not jsonData.contains("Scenario"))
 	{
-		actionScenario.emplace_back(json["item"]);
+		std::cout << "Invalid json format. 'scenario' array not found." << std::endl;
+		return false;
+	}
+
+	for (const auto& action : jsonData["Scenario"])
+	{
+		if (not action.contains("Action"))
+		{
+			std::cout << "Action not found in json object." << std::endl;
+			continue;
+		}
+
+		actionScenario.emplace_back(action["Action"].get<std::string>());
 	}
 
 	return true;
 }
 
 #pragma region BotAction
-void BotAction_Ping::DoAction()
+void BotAction_Ping::DoAction(Bot& targetBot)
 {
-
+	if (not PacketManager::GetInst().HandlePing(targetBot))
+	{
+		std::cout << "Ping action return falied" << std::endl;
+		return;
+	}
 }
 #pragma endregion BotAction
