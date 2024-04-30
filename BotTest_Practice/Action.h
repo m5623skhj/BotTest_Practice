@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include "nlohmann/json.hpp"
 
 struct IBotAction;
 class Bot;
@@ -34,15 +35,20 @@ public:
 	}
 
 public:
+	void Initialize();
+
+public:
 	void DoBotAction(Bot& targetBot);
 
 private:
-	void Initialize();
 	bool ReadBotTestScenario();
+	std::optional<nlohmann::json> OpenTestScenarioJson();
+	bool MakeTestScenarioObject(const nlohmann::json& testScenarioJson);
+	std::shared_ptr<IBotAction> MakeBotActionObject(std::string_view actionString);
 
 private:
-	std::vector<std::string> actionScenario;
-	std::unordered_map<std::string, ActionFactoryFunction> actionFactoryMap;
+	std::vector<std::pair<std::string_view, std::shared_ptr<IBotAction>>> actionScenario;
+	std::unordered_map<std::string_view, ActionFactoryFunction> actionFactoryMap;
 
 	const std::string scenarioFilePath = "BotScenario.json";
 };
@@ -50,12 +56,25 @@ private:
 #pragma region BotAction
 struct IBotAction
 {
+	virtual void InitAction(const nlohmann::json& json) {}
 	virtual void DoAction(Bot& targetBot) = 0;
 };
 
 struct BotAction_Ping : public IBotAction
 {
 	void DoAction(Bot& targetBot) override;
+};
+
+struct BotActionKeyword_LoopStart : public IBotAction
+{
+	void InitAction(const nlohmann::json& json);
+	void DoAction(Bot& targetBot) override;
+};
+
+struct BotActionKeyword_LoopEnd : public IBotAction
+{
+	void InitAction(const nlohmann::json& json);
+	void DoAction(Bot& target) override;
 };
 
 #define REGISTER_BOT_ACTION(ActionType, ActionString){\
