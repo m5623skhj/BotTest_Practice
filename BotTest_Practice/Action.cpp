@@ -10,12 +10,14 @@ BotActionManager& BotActionManager::GetInst()
 	return instance;
 }
 
-void BotActionManager::Initialize()
+bool BotActionManager::Initialize()
 {
 	if (ReadBotTestScenario() == false)
 	{
-		throw;
+		return false;
 	}
+
+	return true;
 }
 
 void BotActionManager::DoBotAction(Bot& targetBot)

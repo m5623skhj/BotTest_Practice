@@ -19,7 +19,7 @@ private:
 	BotActionManager& operator=(const BotActionManager& other) = delete;
 
 public:
-	BotActionManager& GetInst();
+	static BotActionManager& GetInst();
 
 public:
 	template <typename BotActionType>
@@ -35,7 +35,7 @@ public:
 	}
 
 public:
-	void Initialize();
+	bool Initialize();
 
 public:
 	void DoBotAction(Bot& targetBot);
@@ -83,5 +83,7 @@ struct BotActionKeyword_LoopEnd : public IBotAction
 
 #define REGISTER_ALL_BOT_ACTION(){\
 	REGISTER_BOT_ACTION(BotAction_Ping, Ping);\
+	REGISTER_BOT_ACTION(BotActionKeyword_LoopStart, LoopStart);\
+	REGISTER_BOT_ACTION(BotActionKeyword_LoopEnd, LoopEnd);\
 }
 #pragma endregion BotAction
