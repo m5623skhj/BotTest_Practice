@@ -66,7 +66,10 @@
     <ClCompile Include="PacketHandler.cpp">
       <Filter>PacketManager</Filter>
     </ClCompile>
-    <ClCompile Include="Action.cpp">
+    <ClCompile Include="BotActionManager.cpp">
+      <Filter>BotTest</Filter>
+    </ClCompile>
+    <ClCompile Include="BotAction.cpp">
       <Filter>BotTest</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,11 +95,14 @@
     <ClInclude Include="Bot.h">
       <Filter>BotTest</Filter>
     </ClInclude>
-    <ClInclude Include="Action.h">
+    <ClInclude Include="BotActionManager.h">
       <Filter>BotTest</Filter>
     </ClInclude>
     <ClInclude Include="Define.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="BotAction.h">
+      <Filter>BotTest</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

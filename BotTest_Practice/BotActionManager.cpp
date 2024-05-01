@@ -1,7 +1,6 @@
 #include "PreCompile.h"
-#include "Action.h"
+#include "BotActionManager.h"
 #include "Bot.h"
-#include "PacketManager.h"
 #include <fstream>
 
 BotActionManager& BotActionManager::GetInst()
@@ -12,6 +11,8 @@ BotActionManager& BotActionManager::GetInst()
 
 bool BotActionManager::Initialize()
 {
+	REGISTER_ALL_BOT_ACTION();
+
 	if (ReadBotTestScenario() == false)
 	{
 		return false;
@@ -97,7 +98,7 @@ bool BotActionManager::MakeTestScenarioObject(const nlohmann::json& testScenario
 	return true;
 }
 
-std::shared_ptr<IBotAction> BotActionManager::MakeBotActionObject(std::string_view actionString)
+std::shared_ptr<IBotAction> BotActionManager::MakeBotActionObject(const std::string& actionString)
 {
 	auto itor = actionFactoryMap.find(actionString);
 	if (itor == actionFactoryMap.end())
@@ -107,34 +108,3 @@ std::shared_ptr<IBotAction> BotActionManager::MakeBotActionObject(std::string_vi
 
 	return itor->second();
 }
-
-#pragma region BotAction
-void BotAction_Ping::DoAction(Bot& targetBot)
-{
-	if (not PacketManager::GetInst().HandlePing(targetBot))
-	{
-		std::cout << "Ping action return falied" << std::endl;
-		return;
-	}
-}
-
-void BotActionKeyword_LoopStart::InitAction(const nlohmann::json& josn)
-{
-
-}
-
-void BotActionKeyword_LoopStart::DoAction(Bot& targetBot)
-{
-
-}
-
-void BotActionKeyword_LoopEnd::InitAction(const nlohmann::json& josn)
-{
-
-}
-
-void BotActionKeyword_LoopEnd::DoAction(Bot& targetBot)
-{
-
-}
-#pragma endregion BotAction

@@ -4,7 +4,14 @@
             "Action": "Ping"            
         },
         {
+            "Action": "LoopStart",
+            "LoopCount": 2
+        },
+        {
             "Action": "Ping"
+        },
+        {
+            "Action": "LoopEnd"
         }
     ]
 }
