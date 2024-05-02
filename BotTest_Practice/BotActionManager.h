@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <functional>
 #include "BotAction.h"
+#include "Define.h"
 
 using ActionFactoryFunction = std::function<std::shared_ptr<IBotAction>()>;
 
@@ -38,6 +39,7 @@ public:
 	void DoBotAction(Bot& targetBot);
 
 private:
+	void PostProcessBotAction(Bot& targetBot, BOT_POST_ACTION actionCompletedType);
 	bool ReadBotTestScenario();
 	std::optional<nlohmann::json> OpenTestScenarioJson();
 	bool MakeTestScenarioObject(const nlohmann::json& testScenarioJson);
@@ -48,4 +50,13 @@ private:
 	std::unordered_map<std::string, ActionFactoryFunction> actionFactoryMap;
 
 	const std::string scenarioFilePath = "BotScenario.json";
+
+public:
+	std::optional<ScenarioIndex> GetTargetJumpScenario(ScenarioIndex nowIndex);
+
+private:
+	bool GenerateScenarioLoopMap();
+
+private:
+	std::unordered_map<ScenarioIndex, ScenarioIndex> scenarioJumpMap;
 };

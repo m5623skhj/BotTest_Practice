@@ -1,3 +1,3 @@
 #pragma once
 
-using ScenarioIndex = unsigned int;
+using ScenarioIndex = int;

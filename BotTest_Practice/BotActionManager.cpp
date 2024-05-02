@@ -2,6 +2,7 @@
 #include "BotActionManager.h"
 #include "Bot.h"
 #include <fstream>
+#include <stack>
 
 BotActionManager& BotActionManager::GetInst()
 {
@@ -18,6 +19,11 @@ bool BotActionManager::Initialize()
 		return false;
 	}
 
+	if (GenerateScenarioLoopMap() == false)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -30,7 +36,28 @@ void BotActionManager::DoBotAction(Bot& targetBot)
 		return;
 	}
 
-	actionScenario[index].second->DoAction(targetBot);
+	auto postAction = actionScenario[index].second->DoAction(targetBot);
+	targetBot.AddScenarioIndex(1);
+	PostProcessBotAction(targetBot, postAction);
+}
+
+void BotActionManager::PostProcessBotAction(Bot& targetBot, BOT_POST_ACTION actionCompletedType)
+{
+	switch (actionCompletedType)
+	{
+	case NORMAL:
+		break;
+	case DO_NEXT_IMMEDIATLY:
+		DoBotAction(targetBot);
+		break;
+	case STOP:
+		targetBot.StopBot();
+		break;
+	default:
+		std::cout << "Invalid bot action completed type " << actionCompletedType 
+			<< "in " << targetBot.GetScenarioIndex() << std::endl;
+		break;
+	}
 }
 
 bool BotActionManager::ReadBotTestScenario()
@@ -75,6 +102,7 @@ std::optional<nlohmann::json> BotActionManager::OpenTestScenarioJson()
 
 bool BotActionManager::MakeTestScenarioObject(const nlohmann::json& testScenarioJson)
 {
+	ScenarioIndex scenarioIndex{};
 	for (const auto& scenarioJson : testScenarioJson["Scenario"])
 	{
 		if (not scenarioJson.contains("Action"))
@@ -91,8 +119,10 @@ bool BotActionManager::MakeTestScenarioObject(const nlohmann::json& testScenario
 			return false;
 		}
 		actionObject->InitAction(scenarioJson);
+		actionObject->SetScenarioIndex(scenarioIndex);
 
 		actionScenario.emplace_back(actionString, actionObject);
+		++scenarioIndex;
 	}
 
 	return true;
@@ -107,4 +137,49 @@ std::shared_ptr<IBotAction> BotActionManager::MakeBotActionObject(const std::str
 	}
 
 	return itor->second();
+}
+
+std::optional<ScenarioIndex> BotActionManager::GetTargetJumpScenario(ScenarioIndex nowIndex)
+{
+	auto itor = scenarioJumpMap.find(nowIndex);
+	if (itor == scenarioJumpMap.end())
+	{
+		std::cout << "Target jump scenario is invalid " << nowIndex << std::endl;
+		return std::nullopt;
+	}
+
+	return itor->second;
+}
+
+bool BotActionManager::GenerateScenarioLoopMap()
+{
+	std::stack<ScenarioIndex> loopStartStack;
+	for (size_t scenarioIndex = 0; scenarioIndex < actionScenario.size(); ++scenarioIndex)
+	{
+		auto const& actionString = actionScenario[scenarioIndex].first;
+		if (actionString == "LoopStart")
+		{
+			loopStartStack.push(scenarioIndex);
+		}
+		else if (actionString == "LoopEnd")
+		{
+			if (loopStartStack.empty())
+			{
+				std::cout << "Do not matched LoopStart and LoopEnd" << std::endl;
+				return false;
+			}
+
+			auto startIndex = loopStartStack.top();
+			scenarioJumpMap.insert({ static_cast<ScenarioIndex>(scenarioIndex), startIndex });
+			loopStartStack.pop();
+		}
+	}
+
+	if (not loopStartStack.empty())
+	{
+		std::cout << "Do not matched LoopStart and LoopEnd" << std::endl;
+		return false;
+	}
+
+	return true;
 }

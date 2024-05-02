@@ -49,6 +49,12 @@ void BotTest::OnRecv(MultiNetSessionId sessionId, NetBuffer& buffer)
 		std::cout << "Invalid packet id " << packetId << std::endl;
 		return;
 	}
+
+	if (botList[sessionId]->IsStopCommandedBot())
+	{
+		return;
+	}
+
 	ProcessRecvPacketHandle(packetName.value(), *botList[sessionId], buffer);
 }
 

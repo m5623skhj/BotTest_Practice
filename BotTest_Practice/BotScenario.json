@@ -4,14 +4,14 @@
             "Action": "Ping"            
         },
         {
-            "Action": "LoopStart",
-            "LoopCount": 2
+            "Action": "LoopStart"
         },
         {
             "Action": "Ping"
         },
         {
-            "Action": "LoopEnd"
+            "Action": "LoopEnd",
+            "LoopCount": 2
         }
     ]
 }

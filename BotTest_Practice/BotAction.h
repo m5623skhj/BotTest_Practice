@@ -1,33 +1,59 @@
 #pragma once
 #include "nlohmann/json.hpp"
+#include "Define.h"
 
 class Bot;
+class BotActionManager;
+
+enum BOT_POST_ACTION
+{
+	NORMAL,
+	DO_NEXT_IMMEDIATLY,
+	STOP
+};
 
 #pragma region BotAction
 struct IBotAction
 {
+	friend BotActionManager;
+
 	virtual void InitAction(const nlohmann::json& json) {}
-	virtual void DoAction(Bot& targetBot) = 0;
+	virtual BOT_POST_ACTION DoAction(Bot& targetBot) = 0;
+
+public:
+	ScenarioIndex GetScenarioIndex()
+	{
+		return scenarioIndex;
+	}
+
+private:
+	void SetScenarioIndex(ScenarioIndex inScenarioIndex)
+	{
+		scenarioIndex = inScenarioIndex;
+	}
+
+protected:
+	ScenarioIndex scenarioIndex{};
 };
 
 struct BotAction_Ping : public IBotAction
 {
-	void DoAction(Bot& targetBot) override;
+	BOT_POST_ACTION DoAction(Bot& targetBot) override;
 };
 
 struct BotActionKeyword_LoopStart : public IBotAction
 {
 	void InitAction(const nlohmann::json& json);
-	void DoAction(Bot& targetBot) override;
-
-private:
-	int loopCount = 0;
+	BOT_POST_ACTION DoAction(Bot& targetBot) override;
 };
 
 struct BotActionKeyword_LoopEnd : public IBotAction
 {
 	void InitAction(const nlohmann::json& json);
-	void DoAction(Bot& target) override;
+	BOT_POST_ACTION DoAction(Bot& target) override;
+
+private:
+	int loopCount = 0;
 };
 
 #define REGISTER_BOT_ACTION(ActionType, ActionString)\
