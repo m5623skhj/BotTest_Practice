@@ -52,19 +52,24 @@ bool Bot::IsStopCommandedBot()
 }
 
 #pragma region BotActionItems
-void Bot::InitializeLoopCount()
+void Bot::PushLoopCount()
 {
-	loopCount = 0;
+	loopCountStack.push(0);
+}
+
+void Bot::PopLoopCount()
+{
+	loopCountStack.pop();
 }
 
 void Bot::AccumulateLoopCount()
 {
-	++loopCount;
+	++loopCountStack.top();
 }
 
 int Bot::GetLoopCount()
 {
-	return loopCount;
+	return loopCountStack.top();
 }
 
 #pragma endregion BotActionItems

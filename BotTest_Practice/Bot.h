@@ -1,6 +1,7 @@
 #pragma once
 #include "MultiNetClientSession.h"
 #include "Define.h"
+#include <stack>
 
 class Bot
 {
@@ -38,12 +39,13 @@ private:
 
 #pragma region BotActionItems
 public:
-	void InitializeLoopCount();
+	void PushLoopCount();
+	void PopLoopCount();
 	void AccumulateLoopCount();
 	int GetLoopCount();
 
 private:
-	int loopCount = 0;
+	std::stack<int> loopCountStack;
 
 #pragma endregion BotActionItems
 };

@@ -22,6 +22,7 @@ void BotActionKeyword_LoopStart::InitAction(const nlohmann::json& json)
 
 BOT_POST_ACTION BotActionKeyword_LoopStart::DoAction(Bot& targetBot)
 {
+	targetBot.PushLoopCount();
 	return BOT_POST_ACTION::DO_NEXT_IMMEDIATLY;
 }
 
@@ -46,7 +47,7 @@ BOT_POST_ACTION BotActionKeyword_LoopEnd::DoAction(Bot& targetBot)
 	}
 	else
 	{
-		targetBot.InitializeLoopCount();
+		targetBot.PopLoopCount();
 	}
 
 	return BOT_POST_ACTION::DO_NEXT_IMMEDIATLY;
