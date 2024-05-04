@@ -13,7 +13,7 @@ private:
 	BotTest& operator=(const BotTest& other) = delete;
 
 public:
-	static BotTest& GetInstance();
+	static BotTest& GetInst();
 
 public:
 	bool Start(const std::wstring& optionFile);

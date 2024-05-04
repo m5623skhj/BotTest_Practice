@@ -4,7 +4,7 @@
 
 bool Initialize(const std::wstring& optionFile)
 {
-	if (BotTest::GetInstance().Start(optionFile) == false)
+	if (BotTest::GetInst().Start(optionFile) == false)
 	{
 		return false;
 	}

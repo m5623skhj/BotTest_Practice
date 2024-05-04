@@ -1,17 +1,17 @@
 #include "PreCompile.h"
 #include "PacketManager.h"
 
-PacketManager::PacketManager()
-{
-	REGISTER_ALL_PACKET_HANDLER();
-	REGISTER_ALL_RECV_PACKET_HANDLER();
-	REGISTER_ALL_PACKET_NAME();
-}
-
 PacketManager& PacketManager::GetInst()
 {
 	static PacketManager instance;
 	return instance;
+}
+
+void PacketManager::Initialize()
+{
+	REGISTER_ALL_PACKET_HANDLER();
+	REGISTER_ALL_RECV_PACKET_HANDLER();
+	REGISTER_ALL_PACKET_NAME();
 }
 
 PacketHandler PacketManager::GetPacketHandler(PacketId packetId)

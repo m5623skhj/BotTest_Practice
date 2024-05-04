@@ -2,8 +2,9 @@
 #include "BotTest.h"
 #include "PacketManager.h"
 #include "BotActionManager.h"
+#include "PacketManager.h"
 
-BotTest& BotTest::GetInstance()
+BotTest& BotTest::GetInst()
 {
 	static BotTest instance;
 	return instance;
@@ -11,6 +12,8 @@ BotTest& BotTest::GetInstance()
 
 bool BotTest::Start(const std::wstring& optionFile)
 {
+	PacketManager::GetInst().Initialize();
+
 	if (BotActionManager::GetInst().Initialize() == false)
 	{
 		return false;

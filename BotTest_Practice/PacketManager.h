@@ -11,7 +11,7 @@ using RecvPacketHandler = std::function<void(Bot&, NetBuffer&)>;
 class PacketManager
 {
 private:
-	PacketManager();
+	PacketManager() = default;
 	~PacketManager() = default;
 
 	PacketManager(const PacketManager&) = delete;
@@ -19,6 +19,7 @@ private:
 
 public:
 	static PacketManager& GetInst();
+	void Initialize();
 
 public:
 	PacketHandler GetPacketHandler(PacketId packetId);
