@@ -29,21 +29,23 @@ BOT_POST_ACTION BotActionKeyword_LoopStart::DoAction(Bot& targetBot)
 void BotActionKeyword_LoopEnd::InitAction(const nlohmann::json& json)
 {
 	loopCount = json["LoopCount"];
+	
+	auto nextJumpIndex = BotActionManager::GetInst().GetTargetJumpScenario(scenarioIndex);
+	if (nextJumpIndex == std::nullopt)
+	{
+		std::cout << "LoopEnd : request next jump index " << scenarioIndex << " is invalid" << std::endl;
+		throw;
+	}
+
+	jumpScenarioIndex = nextJumpIndex.value();
 }
 
 BOT_POST_ACTION BotActionKeyword_LoopEnd::DoAction(Bot& targetBot)
 {
 	if (targetBot.GetLoopCount() < loopCount)
 	{
-		auto nextJumpIndex = BotActionManager::GetInst().GetTargetJumpScenario(scenarioIndex);
-		if (nextJumpIndex == std::nullopt)
-		{
-			std::cout << "LoopEnd : request next jump index " << scenarioIndex << " is invalid" << std::endl;
-			return BOT_POST_ACTION::STOP;
-		}
-
 		targetBot.AccumulateLoopCount();
-		targetBot.SetScenarioIndex(nextJumpIndex.value());
+		targetBot.SetScenarioIndex(jumpScenarioIndex);
 	}
 	else
 	{

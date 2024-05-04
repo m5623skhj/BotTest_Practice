@@ -53,7 +53,8 @@ struct BotActionKeyword_LoopEnd : public IBotAction
 	BOT_POST_ACTION DoAction(Bot& target) override;
 
 private:
-	int loopCount = 0;
+	int loopCount{};
+	int jumpScenarioIndex{};
 };
 
 #define REGISTER_BOT_ACTION(ActionType, ActionString)\
