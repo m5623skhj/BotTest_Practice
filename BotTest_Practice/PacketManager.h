@@ -11,7 +11,7 @@ using RecvPacketHandler = std::function<void(Bot&, NetBuffer&)>;
 class PacketManager
 {
 private:
-	PacketManager() = default;
+	PacketManager();
 	~PacketManager() = default;
 
 	PacketManager(const PacketManager&) = delete;
@@ -21,18 +21,18 @@ public:
 	static PacketManager& GetInst();
 
 public:
-	PacketHandler GetPacketHandler(std::string packetName);
-	RecvPacketHandler GetRecvPacketHandler(std::string packetName);
+	PacketHandler GetPacketHandler(PacketId packetId);
+	RecvPacketHandler GetRecvPacketHandler(PacketId packetId);
 	std::optional<std::string> GetPacketName(PacketId packetId);
 
 private:
-	std::unordered_map<std::string, PacketHandler> packetHandlerMap;
-	std::unordered_map<std::string, RecvPacketHandler> recvPacketHandlerMap;
+	std::unordered_map<PacketId, PacketHandler> packetHandlerMap;
+	std::unordered_map<PacketId, RecvPacketHandler> recvPacketHandlerMap;
 	std::unordered_map<PacketId, std::string> packetNameMap;
 
 #pragma region PacketHandler
 public:
-	DECLARE_ALL_HANDLER();
-	DECLARE_ALL_RECV_HANDLE_PACKET();
+	DECLARE_ALL_PACKET_HANDLER();
+	DECLARE_ALL_RECV_PACKET_HANDLER();
 #pragma endregion PacketHandler
 };

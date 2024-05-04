@@ -43,19 +43,12 @@ void BotTest::OnRecv(MultiNetSessionId sessionId, NetBuffer& buffer)
 	PacketId packetId;
 	buffer >> packetId;
 
-	auto packetName = PacketManager::GetInst().GetPacketName(packetId);
-	if (packetName == std::nullopt)
-	{
-		std::cout << "Invalid packet id " << packetId << std::endl;
-		return;
-	}
-
 	if (botList[sessionId]->IsStopCommandedBot())
 	{
 		return;
 	}
 
-	ProcessRecvPacketHandle(packetName.value(), *botList[sessionId], buffer);
+	ProcessRecvPacketHandle(packetId, *botList[sessionId], buffer);
 }
 
 void BotTest::OnSend(MultiNetSessionId sessionId, int sendSize)
@@ -78,26 +71,39 @@ void BotTest::OnError(st_Error& error)
 
 }
 
-void BotTest::ProcessPacketHandle(const std::string& packetName, Bot& bot)
+void BotTest::ProcessPacketHandle(PacketId packetId, Bot& bot)
 {
-	auto handler = PacketManager::GetInst().GetPacketHandler(packetName);
-	if (handler != nullptr)
+	auto handler = PacketManager::GetInst().GetPacketHandler(packetId);
+	if (handler == nullptr)
 	{
-		std::cout << "Invalid packet name " << packetName << std::endl;
+		PrintInvalidPacketHandler(packetId);
 		return;
 	}
 
 	handler(bot);
 }
 
-void BotTest::ProcessRecvPacketHandle(const std::string& packetName, Bot& bot, NetBuffer& packet)
+void BotTest::ProcessRecvPacketHandle(PacketId packetId, Bot& bot, NetBuffer& packet)
 {
-	auto handler = PacketManager::GetInst().GetRecvPacketHandler(packetName);
-	if (handler != nullptr)
+	auto handler = PacketManager::GetInst().GetRecvPacketHandler(packetId);
+	if (handler == nullptr)
 	{
-		std::cout << "Invalid packet " << packetName << std::endl;
+		PrintInvalidPacketHandler(packetId);
 		return;
 	}
 
 	handler(bot, packet);
+}
+
+void BotTest::PrintInvalidPacketHandler(PacketId invalidPacketId)
+{
+	auto packetName = PacketManager::GetInst().GetPacketName(invalidPacketId);
+	if (packetName == std::nullopt)
+	{
+		std::cout << "Invalid packet name " << packetName.value() << std::endl;
+	}
+	else
+	{
+		std::cout << "Invalid packet id " << invalidPacketId << std::endl;
+	}
 }

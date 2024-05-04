@@ -2,6 +2,7 @@
 #include "MultiNetClient.h"
 #include "Bot.h"
 #include <vector>
+#include "TestProtocol.h"
 
 class BotTest : public MultiNetClient
 {
@@ -31,8 +32,10 @@ private:
 	void OnError(st_Error& error) override;
 
 private:
-	void ProcessPacketHandle(const std::string& packetName, Bot& bot);
-	void ProcessRecvPacketHandle(const std::string& packetName, Bot& bot, NetBuffer& packet);
+	void ProcessPacketHandle(PacketId packetId, Bot& bot);
+	void ProcessRecvPacketHandle(PacketId packetId, Bot& bot, NetBuffer& packet);
+
+	void PrintInvalidPacketHandler(PacketId invalidPacketId);
 
 private:
 	std::vector<Bot::SPtr> botList;

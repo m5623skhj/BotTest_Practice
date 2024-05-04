@@ -1,15 +1,22 @@
 #include "PreCompile.h"
 #include "PacketManager.h"
 
+PacketManager::PacketManager()
+{
+	REGISTER_ALL_PACKET_HANDLER();
+	REGISTER_ALL_RECV_PACKET_HANDLER();
+	REGISTER_ALL_PACKET_NAME();
+}
+
 PacketManager& PacketManager::GetInst()
 {
 	static PacketManager instance;
 	return instance;
 }
 
-PacketHandler PacketManager::GetPacketHandler(std::string packetName)
+PacketHandler PacketManager::GetPacketHandler(PacketId packetId)
 {
-	auto iter = packetHandlerMap.find(packetName);
+	auto iter = packetHandlerMap.find(packetId);
 	if (iter == packetHandlerMap.end())
 	{
 		return nullptr;
@@ -18,9 +25,9 @@ PacketHandler PacketManager::GetPacketHandler(std::string packetName)
 	return iter->second;
 }
 
-RecvPacketHandler PacketManager::GetRecvPacketHandler(std::string packetName)
+RecvPacketHandler PacketManager::GetRecvPacketHandler(PacketId packetId)
 {
-	auto iter = recvPacketHandlerMap.find(packetName);
+	auto iter = recvPacketHandlerMap.find(packetId);
 	if (iter == recvPacketHandlerMap.end())
 	{
 		return nullptr;
