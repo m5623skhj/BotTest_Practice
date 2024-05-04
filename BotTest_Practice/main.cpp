@@ -1,10 +1,10 @@
 #include "PreCompile.h"
 #include <iostream>
-#include "BotActionManager.h"
+#include "BotTest.h"
 
-bool Initialize()
+bool Initialize(const std::wstring& optionFile)
 {
-	if (BotActionManager::GetInst().Initialize() == false)
+	if (BotTest::GetInstance().Start(optionFile) == false)
 	{
 		return false;
 	}
@@ -22,7 +22,7 @@ int main()
 	std::cout << "--------------------------------" << std::endl;
 	std::cout << "Initialize bot test" << std::endl;
 	std::cout << "--------------------------------" << std::endl << std::endl << std::endl;
-	if (Initialize() == false)
+	if (Initialize(L"") == false)
 	{
 		std::cout << "Initialize bot test failed" << std::endl;
 		return 0;

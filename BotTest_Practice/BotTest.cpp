@@ -1,6 +1,7 @@
 #include "PreCompile.h"
 #include "BotTest.h"
 #include "PacketManager.h"
+#include "BotActionManager.h"
 
 BotTest& BotTest::GetInstance()
 {
@@ -10,6 +11,11 @@ BotTest& BotTest::GetInstance()
 
 bool BotTest::Start(const std::wstring& optionFile)
 {
+	if (BotActionManager::GetInst().Initialize() == false)
+	{
+		return false;
+	}
+
 	if (MultiNetClient::Start(optionFile) == false)
 	{
 		return false;
