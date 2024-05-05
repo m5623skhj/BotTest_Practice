@@ -22,7 +22,7 @@ int main()
 	std::cout << "--------------------------------" << std::endl;
 	std::cout << "Initialize bot test" << std::endl;
 	std::cout << "--------------------------------" << std::endl << std::endl << std::endl;
-	if (Initialize(L"") == false)
+	if (Initialize(L"OptionFile/BotTestOptionFile.txt") == false)
 	{
 		std::cout << "Initialize bot test failed" << std::endl;
 		return 0;

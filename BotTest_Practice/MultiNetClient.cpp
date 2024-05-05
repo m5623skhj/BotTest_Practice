@@ -96,8 +96,6 @@ bool MultiNetClient::OptionParsing(const std::wstring& optionFile)
 		return false;
 	if (!parser.GetValue_Byte(pBuff, L"NETCLIENT", L"WORKER_THREAD", &numOfWorkerThreads))
 		return false;
-	if (!parser.GetValue_Byte(pBuff, L"NETCLIENT", L"USE_IOCPWORKER", &numOfUsingWorkerThreads))
-		return false;
 	if (!parser.GetValue_Byte(pBuff, L"NETCLIENT", L"NAGLE_ON", (BYTE*)&nagleOn))
 		return false;
 	if (!parser.GetValue_Byte(pBuff, L"NETCLIENT", L"RECONNECT", (BYTE*)&reconnectDiconnectedSession))
@@ -108,7 +106,7 @@ bool MultiNetClient::OptionParsing(const std::wstring& optionFile)
 		return false;
 	if (!parser.GetValue_Byte(pBuff, L"OPTION", L"LOG_LEVEL", &DebugLevel))
 		return false;
-	if (!parser.GetValue_Short(pBuff, L"LANCLIENT", L"SESSION_COUNT", (short*)&numOfSession))
+	if (!parser.GetValue_Short(pBuff, L"OPTION", L"SESSION_COUNT", (short*)&numOfSession))
 		return false;
 
 	NetBuffer::m_byHeaderCode = HeaderCode;

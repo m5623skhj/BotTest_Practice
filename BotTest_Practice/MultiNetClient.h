@@ -89,7 +89,6 @@ private:
 	std::atomic_uint reconnectCount{};
 
 	BYTE numOfWorkerThreads;
-	BYTE numOfUsingWorkerThreads;
 
 	WORD numOfSession;
 	std::atomic<UINT64> m_sessionIdGenerator{};
