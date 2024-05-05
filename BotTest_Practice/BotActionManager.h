@@ -49,7 +49,7 @@ private:
 	std::vector<std::pair<std::string, std::shared_ptr<IBotAction>>> actionScenario;
 	std::unordered_map<std::string, ActionFactoryFunction> actionFactoryMap;
 
-	const std::string scenarioFilePath = "BotScenario.json";
+	const std::string scenarioFilePath = "OptionFile/BotScenario.json";
 
 public:
 	std::optional<ScenarioIndex> GetTargetJumpScenario(ScenarioIndex nowIndex);
