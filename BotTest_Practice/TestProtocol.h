@@ -42,7 +42,7 @@ public:
 	GET_PACKET_ID(PACKET_ID::ECHO_STRING_PACEKT);
 
 public:
-	char echoString[30];
+	std::string echoString;
 };
 
 #define DECLARE_PACKET_HANDLER(PacketType)\

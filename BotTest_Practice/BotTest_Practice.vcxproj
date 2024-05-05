@@ -145,6 +145,7 @@
     <ClCompile Include="MultiNetClient.cpp" />
     <ClCompile Include="MultiNetClientSession.cpp" />
     <ClCompile Include="PacketHandler.cpp" />
+    <ClCompile Include="PacketHandlerUtil.cpp" />
     <ClCompile Include="PacketManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +157,7 @@
     <ClInclude Include="EnumType.h" />
     <ClInclude Include="MultiNetClient.h" />
     <ClInclude Include="MultiNetClientSession.h" />
+    <ClInclude Include="PacketHandlerUtil.h" />
     <ClInclude Include="PacketManager.h" />
     <ClInclude Include="TestProtocol.h" />
   </ItemGroup>

@@ -3,23 +3,31 @@
 #include "PacketManager.h"
 #include "BotActionManager.h"
 
+#define HANDLE(HandlerTargetName, TargetBot){\
+	if (not PacketManager::GetInst().Handle##HandlerTargetName(TargetBot))\
+	{\
+		std::cout << #HandlerTargetName << " action return false" << std::endl;\
+		return BOT_POST_ACTION::STOP;\
+	}\
+}
+
 #pragma region BotAction
 BOT_POST_ACTION BotAction_Ping::DoAction(Bot& targetBot)
 {
-	if (not PacketManager::GetInst().HandlePing(targetBot))
-	{
-		std::cout << "Ping action return falied" << std::endl;
-		return BOT_POST_ACTION::STOP;
-	}
+	HANDLE(Ping, targetBot);
 
 	return BOT_POST_ACTION::NORMAL;
 }
 
-void BotActionKeyword_LoopStart::InitAction(const nlohmann::json& json)
+BOT_POST_ACTION BotAction_TestStringPacket::DoAction(Bot& targetBot)
 {
+	HANDLE(TestStringPacket, targetBot);
 
+	return BOT_POST_ACTION::NORMAL;
 }
+#pragma endregion BotAction
 
+#pragma region BotActionKeyword
 BOT_POST_ACTION BotActionKeyword_LoopStart::DoAction(Bot& targetBot)
 {
 	targetBot.PushLoopCount();
@@ -29,7 +37,7 @@ BOT_POST_ACTION BotActionKeyword_LoopStart::DoAction(Bot& targetBot)
 void BotActionKeyword_LoopEnd::InitAction(const nlohmann::json& json)
 {
 	loopCount = json["LoopCount"];
-	
+
 	auto nextJumpIndex = BotActionManager::GetInst().GetTargetJumpScenario(scenarioIndex);
 	if (nextJumpIndex == std::nullopt)
 	{
@@ -54,4 +62,4 @@ BOT_POST_ACTION BotActionKeyword_LoopEnd::DoAction(Bot& targetBot)
 
 	return BOT_POST_ACTION::DO_NEXT_IMMEDIATLY;
 }
-#pragma endregion BotAction
+#pragma endregion BotActionKeyword

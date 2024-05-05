@@ -19,6 +19,8 @@ public:
 	bool Start(const std::wstring& optionFile);
 	void Stop();
 
+	bool SendPacket(NetBuffer& packet, MultiNetSessionId targetSessionId);
+
 private:
 	void OnConnected(MultiNetSessionId sessionId) override;
 	void OnDisconnected(MultiNetSessionId sessionId) override;

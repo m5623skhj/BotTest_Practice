@@ -29,6 +29,8 @@ public:
 	void StopBot();
 	bool IsStopCommandedBot();
 
+	MultiNetSessionId GetSessionId();
+
 private:
 	MultiNetSessionId sessionId{};
 	std::atomic_bool isConnected{};
@@ -39,6 +41,15 @@ private:
 
 #pragma region BotActionItems
 public:
+	void SetTestString(const std::string& inString) { testString = inString; }
+	std::string GetTestString() { return testString; }
+
+private:
+	std::string testString{};
+#pragma endregion BotActionItems
+
+#pragma region BotActionKeywordItems
+public:
 	void PushLoopCount();
 	void PopLoopCount();
 	void AccumulateLoopCount();
@@ -47,5 +58,5 @@ public:
 private:
 	std::stack<int> loopCountStack;
 
-#pragma endregion BotActionItems
+#pragma endregion BotActionKeywordItems
 };

@@ -72,6 +72,9 @@
     <ClCompile Include="BotAction.cpp">
       <Filter>BotTest</Filter>
     </ClCompile>
+    <ClCompile Include="PacketHandlerUtil.cpp">
+      <Filter>PacketManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BotTest.h">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="BotAction.h">
       <Filter>BotTest</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandlerUtil.h">
+      <Filter>PacketManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

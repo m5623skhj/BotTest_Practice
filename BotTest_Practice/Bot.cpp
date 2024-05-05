@@ -51,6 +51,11 @@ bool Bot::IsStopCommandedBot()
 	return stopCommanded.load();
 }
 
+MultiNetSessionId Bot::GetSessionId()
+{
+	return sessionId;
+}
+
 #pragma region BotActionItems
 void Bot::PushLoopCount()
 {

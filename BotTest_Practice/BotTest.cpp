@@ -32,6 +32,11 @@ void BotTest::Stop()
 	MultiNetClient::Stop();
 }
 
+bool BotTest::SendPacket(NetBuffer& packet, MultiNetSessionId targetSessionId)
+{
+	return MultiNetClient::SendPacket(packet, targetSessionId);
+}
+
 void BotTest::OnConnected(MultiNetSessionId sessionId)
 {
 

@@ -36,14 +36,21 @@ protected:
 	ScenarioIndex scenarioIndex{};
 };
 
+#pragma region BotAction
 struct BotAction_Ping : public IBotAction
 {
 	BOT_POST_ACTION DoAction(Bot& targetBot) override;
 };
 
+struct BotAction_TestStringPacket : public IBotAction
+{
+	BOT_POST_ACTION DoAction(Bot& targetBot) override;
+};
+#pragma endregion BotAction
+
+#pragma region BotActionKeyword
 struct BotActionKeyword_LoopStart : public IBotAction
 {
-	void InitAction(const nlohmann::json& json);
 	BOT_POST_ACTION DoAction(Bot& targetBot) override;
 };
 
@@ -56,6 +63,7 @@ private:
 	int loopCount{};
 	int jumpScenarioIndex{};
 };
+#pragma endregion BotActionKeyword
 
 #define REGISTER_BOT_ACTION(ActionType, ActionString)\
 	RegisterBotAction<ActionType>(#ActionString);
@@ -64,6 +72,7 @@ private:
 	REGISTER_BOT_ACTION(BotAction_Ping, Ping)\
 	REGISTER_BOT_ACTION(BotActionKeyword_LoopStart, LoopStart)\
 	REGISTER_BOT_ACTION(BotActionKeyword_LoopEnd, LoopEnd)\
+	REGISTER_BOT_ACTION(BotAction_TestStringPacket, TestString)\
 }
 
 #pragma endregion BotAction
