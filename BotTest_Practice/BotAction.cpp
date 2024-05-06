@@ -34,7 +34,7 @@ BOT_POST_ACTION BotActionKeyword_LoopStart::DoAction(Bot& targetBot)
 	return BOT_POST_ACTION::DO_NEXT_IMMEDIATLY;
 }
 
-void BotActionKeyword_LoopEnd::InitAction(const nlohmann::json& json)
+bool BotActionKeyword_LoopEnd::InitAction(const nlohmann::json& json)
 {
 	loopCount = json["LoopCount"];
 
@@ -42,10 +42,11 @@ void BotActionKeyword_LoopEnd::InitAction(const nlohmann::json& json)
 	if (nextJumpIndex == std::nullopt)
 	{
 		std::cout << "LoopEnd : request next jump index " << scenarioIndex << " is invalid" << std::endl;
-		throw;
+		return false;
 	}
 
 	jumpScenarioIndex = nextJumpIndex.value();
+	return true;
 }
 
 BOT_POST_ACTION BotActionKeyword_LoopEnd::DoAction(Bot& targetBot)

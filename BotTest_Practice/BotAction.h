@@ -17,7 +17,7 @@ struct IBotAction
 {
 	friend BotActionManager;
 
-	virtual void InitAction(const nlohmann::json& json) {}
+	virtual bool InitAction(const nlohmann::json& json) { return true; }
 	virtual BOT_POST_ACTION DoAction(Bot& targetBot) = 0;
 
 public:
@@ -56,7 +56,7 @@ struct BotActionKeyword_LoopStart : public IBotAction
 
 struct BotActionKeyword_LoopEnd : public IBotAction
 {
-	void InitAction(const nlohmann::json& json);
+	bool InitAction(const nlohmann::json& json);
 	BOT_POST_ACTION DoAction(Bot& target) override;
 
 private:

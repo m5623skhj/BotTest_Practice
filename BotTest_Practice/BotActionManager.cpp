@@ -45,12 +45,12 @@ void BotActionManager::PostProcessBotAction(Bot& targetBot, BOT_POST_ACTION acti
 {
 	switch (actionCompletedType)
 	{
-	case NORMAL:
+	case BOT_POST_ACTION::NORMAL:
 		break;
-	case DO_NEXT_IMMEDIATLY:
+	case BOT_POST_ACTION::DO_NEXT_IMMEDIATLY:
 		DoBotAction(targetBot);
 		break;
-	case STOP:
+	case BOT_POST_ACTION::STOP:
 		targetBot.StopBot();
 		break;
 	default:
@@ -118,7 +118,11 @@ bool BotActionManager::MakeTestScenarioObject(const nlohmann::json& testScenario
 			std::cout << "Action string " << actionString << "is invalid" << std::endl;
 			return false;
 		}
-		actionObject->InitAction(scenarioJson);
+		if (not actionObject->InitAction(scenarioJson))
+		{
+			std::cout << "Scenario action index " << scenarioIndex << " was InitAction() failed" << std::endl;
+			return false;
+		}
 		actionObject->SetScenarioIndex(scenarioIndex);
 
 		actionScenario.emplace_back(actionString, actionObject);
