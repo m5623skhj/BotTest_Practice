@@ -4,41 +4,52 @@
 
 using PacketId = unsigned int;
 
-#define GET_PACKET_ID(packetId) virtual PacketId GetPacketId() const override { return static_cast<PacketId>(packetId); }
+#define GET_PACKET_ID(InPacketId) PacketId GetPacketId() const { return static_cast<PacketId>(InPacketId); }
 
+template<class ClassType, PacketId(ClassType::*)() const>
+struct SignatureFunction_Type { using type = ClassType; };
+
+template<class ClassType, class=ClassType>
+struct SignatureFunction_Predicate : std::false_type {};
+template<class ClassType>
+struct SignatureFunction_Predicate<ClassType, typename SignatureFunction_Type<ClassType, &ClassType::GetPacketId>::type>
+	: std::true_type {};
+
+template<class ClassType>
+constexpr bool SignatureFunction_Checker = SignatureFunction_Predicate<ClassType>::value;
+
+template<class Derived>
 struct IPacket
 {
-public:
-	IPacket() = default;
+	IPacket() { static_assert(SignatureFunction_Checker<Derived>, "Classes inheriting from IPacket must define GetPacketId()"); }
 	virtual ~IPacket() = default;
-
-	virtual PacketId GetPacketId() const = 0;
+	PacketId GetPacketId() const { return static_cast<Derived>(this)->GetPacketId(); }
 };
 
-class Ping : public IPacket
+struct Ping : private IPacket<Ping>
 {
-public:
+	~Ping() override = default;
 	GET_PACKET_ID(PACKET_ID::PING);
 };
 
-class Pong : public IPacket
+struct Pong : public IPacket<Pong>
 {
-public:
+	~Pong() override = default;
 	GET_PACKET_ID(PACKET_ID::PONG);
 };
 
-class TestStringPacket : public IPacket
+struct TestStringPacket : public IPacket<TestStringPacket>
 {
-public:
+	~TestStringPacket() override = default;
 	GET_PACKET_ID(PACKET_ID::TEST_STRING_PACKET);
 
 public:
 	std::string testString;
 };
 
-class EchoStringPacket : public IPacket
+struct EchoStringPacket : public IPacket<EchoStringPacket>
 {
-public:
+	~EchoStringPacket() override = default;
 	GET_PACKET_ID(PACKET_ID::ECHO_STRING_PACEKT);
 
 public:
