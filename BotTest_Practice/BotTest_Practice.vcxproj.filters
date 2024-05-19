@@ -25,6 +25,9 @@
     <Filter Include="PacketManager">
       <UniqueIdentifier>{7248d861-5e02-461c-8814-283272bc5ff5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\BehaviorTree">
+      <UniqueIdentifier>{0755a837-08f3-418a-97f3-90ac86ad725f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -75,6 +78,18 @@
     <ClCompile Include="PacketHandlerUtil.cpp">
       <Filter>PacketManager</Filter>
     </ClCompile>
+    <ClCompile Include="BehaviorNode.cpp">
+      <Filter>include\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="BehaviorTree.cpp">
+      <Filter>include\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Decorator.cpp">
+      <Filter>include\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="IBehaviorNode.cpp">
+      <Filter>include\BehaviorTree</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BotTest.h">
@@ -109,6 +124,18 @@
     </ClInclude>
     <ClInclude Include="PacketHandlerUtil.h">
       <Filter>PacketManager</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorNode.h">
+      <Filter>include\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTree.h">
+      <Filter>include\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Decorator.h">
+      <Filter>include\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="IBehaviorNode.h">
+      <Filter>include\BehaviorTree</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

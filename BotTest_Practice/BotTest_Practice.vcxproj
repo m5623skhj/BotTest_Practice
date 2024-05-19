@@ -137,10 +137,14 @@
     <ClCompile Include="..\..\..\..\Desktop\Common\Parse.cpp" />
     <ClCompile Include="..\..\..\..\Desktop\Common\PreCompile.cpp" />
     <ClCompile Include="..\..\..\..\Desktop\Common\Ringbuffer.cpp" />
+    <ClCompile Include="BehaviorNode.cpp" />
+    <ClCompile Include="BehaviorTree.cpp" />
     <ClCompile Include="BotActionManager.cpp" />
     <ClCompile Include="Bot.cpp" />
     <ClCompile Include="BotAction.cpp" />
     <ClCompile Include="BotTest.cpp" />
+    <ClCompile Include="Decorator.cpp" />
+    <ClCompile Include="IBehaviorNode.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MultiNetClient.cpp" />
     <ClCompile Include="MultiNetClientSession.cpp" />
@@ -149,12 +153,16 @@
     <ClCompile Include="PacketManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BehaviorNode.h" />
+    <ClInclude Include="BehaviorTree.h" />
     <ClInclude Include="BotActionManager.h" />
     <ClInclude Include="Bot.h" />
     <ClInclude Include="BotAction.h" />
     <ClInclude Include="BotTest.h" />
+    <ClInclude Include="Decorator.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="EnumType.h" />
+    <ClInclude Include="IBehaviorNode.h" />
     <ClInclude Include="MultiNetClient.h" />
     <ClInclude Include="MultiNetClientSession.h" />
     <ClInclude Include="PacketHandlerUtil.h" />
